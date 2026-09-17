@@ -1,315 +1,148 @@
-import React, { useState, useEffect, useRef } from 'react'
-import L from 'leaflet'
-import { Play, Pause, RotateCcw, Calendar, Clock, MapPin, Route, Gauge } from 'lucide-react'
+import React, { useState } from 'react'
+import { Calendar, Download, Search, Route, MapPin } from 'lucide-react'
 import PageHeader from '@/components/layout/PageHeader'
 import Card from '@/components/common/Card'
 import Button from '@/components/common/Button'
-import { Trip } from '@/types/gps'
-import { formatDuration, formatDate } from '@/utils/dateUtils'
-import { formatDistance, formatSpeed } from '@/utils/formatUtils'
+import DataTable, { Column } from '@/components/tables/DataTable'
+import Pagination from '@/components/tables/Pagination'
 import { useVehicles } from '@/features/vehicles/hooks/useVehicles'
 
-const MOCK_TRIPS: Trip[] = [
-  {
-    id: 'trip-001',
-    vehicleId: 'veh-001',
-    driverName: 'Rajesh Kumar',
-    startTime: new Date(Date.now() - 3600000 * 5).toISOString(),
-    endTime: new Date(Date.now() - 3600000 * 2).toISOString(),
-    startAddress: 'Central Warehouse Dock #4, MG Road, Bangalore',
-    endAddress: 'Whitefield Tech Park Distribution Center',
-    distanceKm: 28.4,
-    durationMinutes: 180,
-    maxSpeedKmh: 76,
-    averageSpeedKmh: 42,
-    idleMinutes: 24,
-    routePoints: [
-      { lat: 12.9716, lng: 77.5946, timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), speedKmh: 0 },
-      { lat: 12.9740, lng: 77.6050, timestamp: new Date(Date.now() - 3600000 * 4.5).toISOString(), speedKmh: 35 },
-      { lat: 12.9780, lng: 77.6200, timestamp: new Date(Date.now() - 3600000 * 4).toISOString(), speedKmh: 52 },
-      { lat: 12.9820, lng: 77.6350, timestamp: new Date(Date.now() - 3600000 * 3.5).toISOString(), speedKmh: 68 },
-      { lat: 12.9860, lng: 77.6600, timestamp: new Date(Date.now() - 3600000 * 3).toISOString(), speedKmh: 76 },
-      { lat: 12.9890, lng: 77.7000, timestamp: new Date(Date.now() - 3600000 * 2.5).toISOString(), speedKmh: 48 },
-      { lat: 12.9698, lng: 77.7500, timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), speedKmh: 0 },
-    ],
-  },
-  {
-    id: 'trip-002',
-    vehicleId: 'veh-002',
-    driverName: 'Anil Sharma',
-    startTime: new Date(Date.now() - 3600000 * 9).toISOString(),
-    endTime: new Date(Date.now() - 3600000 * 6.5).toISOString(),
-    startAddress: 'Koramangala 4th Block Dispatch Bay',
-    endAddress: 'Electronic City Phase 1 Logistics Gate',
-    distanceKm: 19.8,
-    durationMinutes: 150,
-    maxSpeedKmh: 64,
-    averageSpeedKmh: 38,
-    idleMinutes: 18,
-    routePoints: [
-      { lat: 12.9352, lng: 77.6245, timestamp: new Date(Date.now() - 3600000 * 9).toISOString(), speedKmh: 0 },
-      { lat: 12.9180, lng: 77.6050, timestamp: new Date(Date.now() - 3600000 * 8.5).toISOString(), speedKmh: 42 },
-      { lat: 12.8900, lng: 77.6400, timestamp: new Date(Date.now() - 3600000 * 7.5).toISOString(), speedKmh: 64 },
-      { lat: 12.8399, lng: 77.6770, timestamp: new Date(Date.now() - 3600000 * 6.5).toISOString(), speedKmh: 0 },
-    ],
-  },
+interface HistoricTrip {
+  id: string
+  date: string
+  vehicleNo: string
+  startLocation: string
+  endLocation: string
+  distanceKm: number
+  durationStr: string
+}
+
+const HISTORIC_TRIPS: HistoricTrip[] = [
+  { id: 'h-1', date: '16-09-2025', vehicleNo: 'TN01AB1234', startLocation: 'Chennai', endLocation: 'Kanchipuram', distanceKm: 76.4, durationStr: '1h 45m' },
+  { id: 'h-2', date: '15-09-2025', vehicleNo: 'TN03CD5678', startLocation: 'Vellore', endLocation: 'Chennai', distanceKm: 132.6, durationStr: '3h 22m' },
+  { id: 'h-3', date: '14-09-2025', vehicleNo: 'TN06EF9012', startLocation: 'Tiruvallur', endLocation: 'Chennai', distanceKm: 45.2, durationStr: '1h 10m' },
+  { id: 'h-4', date: '13-09-2025', vehicleNo: 'TN08GH3456', startLocation: 'Chengalpattu', endLocation: 'Vellore', distanceKm: 98.7, durationStr: '2h 15m' },
+  { id: 'h-5', date: '12-09-2025', vehicleNo: 'TN10IJ7890', startLocation: 'Chennai', endLocation: 'Tiruvallur', distanceKm: 52.8, durationStr: '58m' },
+  { id: 'h-6', date: '11-09-2025', vehicleNo: 'TN12KL3456', startLocation: 'Kanchipuram', endLocation: 'Chennai', distanceKm: 74.1, durationStr: '1h 38m' },
+  { id: 'h-7', date: '10-09-2025', vehicleNo: 'TN14MN1234', startLocation: 'Salem', endLocation: 'Erode', distanceKm: 64.3, durationStr: '1h 25m' },
+  { id: 'h-8', date: '09-09-2025', vehicleNo: 'TN16OP5678', startLocation: 'Thiruvannamalai', endLocation: 'Vellore', distanceKm: 85.0, durationStr: '1h 55m' },
 ]
 
 export const TripHistoryPage: React.FC = () => {
   const { vehicles } = useVehicles()
-  const [selectedTrip, setSelectedTrip] = useState<Trip>(MOCK_TRIPS[0])
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [playbackIndex, setPlaybackIndex] = useState(0)
+  const [selectedVehicle, setSelectedVehicle] = useState('TN01AB1234')
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const mapRef = useRef<L.Map | null>(null)
-  const mapContainerRef = useRef<HTMLDivElement | null>(null)
-  const markerRef = useRef<L.Marker | null>(null)
-  const polylineRef = useRef<L.Polyline | null>(null)
+  const columns: Column<HistoricTrip>[] = [
+    {
+      key: 'date',
+      header: 'Date',
+      render: (t) => <span className="text-slate-600 font-medium">{t.date}</span>,
+    },
+    {
+      key: 'vehicleNo',
+      header: 'Vehicle No',
+      render: (t) => <span className="font-bold text-slate-900">{t.vehicleNo}</span>,
+    },
+    {
+      key: 'startLocation',
+      header: 'Start Location',
+      render: (t) => (
+        <span className="flex items-center gap-1.5 text-slate-700 font-medium">
+          <MapPin className="w-3.5 h-3.5 text-emerald-500" /> {t.startLocation}
+        </span>
+      ),
+    },
+    {
+      key: 'endLocation',
+      header: 'End Location',
+      render: (t) => (
+        <span className="flex items-center gap-1.5 text-slate-700 font-medium">
+          <MapPin className="w-3.5 h-3.5 text-rose-500" /> {t.endLocation}
+        </span>
+      ),
+    },
+    {
+      key: 'distanceKm',
+      header: 'Distance',
+      render: (t) => <span className="font-bold text-slate-800">{t.distanceKm} km</span>,
+    },
+    {
+      key: 'durationStr',
+      header: 'Duration',
+      render: (t) => <span className="text-slate-600 font-medium">{t.durationStr}</span>,
+    },
+  ]
 
-  // Initialize Map
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-
-    if (!mapRef.current) {
-      const map = L.map(mapContainerRef.current, {
-        center: [12.9716, 77.5946],
-        zoom: 12,
-        zoomControl: false,
-      })
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
-        maxZoom: 19,
-      }).addTo(map)
-
-      mapRef.current = map
-    }
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove()
-        mapRef.current = null
-      }
-    }
-  }, [])
-
-  // Draw Trip Route when selectedTrip changes
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map || !selectedTrip) return
-
-    if (polylineRef.current) map.removeLayer(polylineRef.current)
-    if (markerRef.current) map.removeLayer(markerRef.current)
-
-    const latLngs = selectedTrip.routePoints.map((pt) => [pt.lat, pt.lng] as [number, number])
-
-    if (latLngs.length > 0) {
-      // Draw path line
-      polylineRef.current = L.polyline(latLngs, {
-        color: '#06b6d4',
-        weight: 4,
-        opacity: 0.85,
-      }).addTo(map)
-
-      // Fit map bounds
-      map.fitBounds(polylineRef.current.getBounds(), { padding: [40, 40] })
-
-      // Create animated vehicle marker
-      const startPt = latLngs[0]
-      const icon = L.divIcon({
-        className: 'playback-marker',
-        html: `
-          <div class="w-8 h-8 rounded-full bg-cyan-500 border-2 border-white shadow-xl flex items-center justify-center text-slate-950 font-bold text-xs">
-            🏎️
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-      })
-
-      markerRef.current = L.marker(startPt, { icon }).addTo(map)
-    }
-
-    setPlaybackIndex(0)
-    setIsPlaying(false)
-  }, [selectedTrip])
-
-  // Playback timer
-  useEffect(() => {
-    let timer: any = null
-    if (isPlaying && selectedTrip) {
-      timer = setInterval(() => {
-        setPlaybackIndex((prev) => {
-          if (prev >= selectedTrip.routePoints.length - 1) {
-            setIsPlaying(false)
-            return prev
-          }
-          const next = prev + 1
-          const pt = selectedTrip.routePoints[next]
-          if (markerRef.current && mapRef.current) {
-            markerRef.current.setLatLng([pt.lat, pt.lng])
-          }
-          return next
-        })
-      }, 1200)
-    }
-    return () => clearInterval(timer)
-  }, [isPlaying, selectedTrip])
-
-  const currentPoint = selectedTrip.routePoints[playbackIndex]
+  const exportCSV = () => {
+    const headers = ['Date', 'Vehicle No', 'Start Location', 'End Location', 'Distance (km)', 'Duration']
+    const rows = HISTORIC_TRIPS.map((t) => [t.date, t.vehicleNo, t.startLocation, t.endLocation, t.distanceKm, t.durationStr])
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `trips_history_${selectedVehicle}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <div className="space-y-6 text-left">
       <PageHeader
-        title="Trip History & Route Replay"
-        subtitle="Historical trip logs, telemetry analysis, and animated GPS playback"
+        title="Trips / History"
+        subtitle="Historical trip logs, route replay records, and mileage logs"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Trip Selector & Trip Details */}
-        <div className="space-y-4">
-          <Card title="Recorded Trips" subtitle="Select a trip to inspect or replay">
-            <div className="space-y-2.5">
-              {MOCK_TRIPS.map((trip) => {
-                const isSelected = trip.id === selectedTrip.id
+      {/* Filter and Export Bar matching Mockup */}
+      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Vehicle Dropdown */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-slate-500 font-medium">Vehicle:</span>
+            <select
+              value={selectedVehicle}
+              onChange={(e) => setSelectedVehicle(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+            >
+              {vehicles.map((v) => (
+                <option key={v.id} value={v.plateNumber}>
+                  {v.plateNumber}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                return (
-                  <div
-                    key={trip.id}
-                    onClick={() => setSelectedTrip(trip)}
-                    className={`p-3.5 rounded-xl border text-xs cursor-pointer transition ${
-                      isSelected
-                        ? 'bg-cyan-500/15 border-cyan-500/40'
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between font-semibold text-white mb-1">
-                      <span>{trip.driverName}</span>
-                      <span className="text-cyan-400 font-bold">{formatDistance(trip.distanceKm)}</span>
-                    </div>
-
-                    <div className="text-slate-400 space-y-1">
-                      <p className="truncate flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-emerald-400 shrink-0" /> {trip.startAddress}
-                      </p>
-                      <p className="truncate flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-rose-400 shrink-0" /> {trip.endAddress}
-                      </p>
-                    </div>
-
-                    <div className="mt-2.5 pt-2 border-t border-slate-800 flex justify-between text-[10px] text-slate-500">
-                      <span>{formatDate(trip.startTime)}</span>
-                      <span>{formatDuration(trip.durationMinutes)}</span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </Card>
-
-          {/* Trip Analytics Stats */}
-          <Card title="Trip Summary Analytics">
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-                <span className="text-slate-400 block">Distance</span>
-                <span className="text-base font-bold text-white mt-1 block">
-                  {formatDistance(selectedTrip.distanceKm)}
-                </span>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-                <span className="text-slate-400 block">Duration</span>
-                <span className="text-base font-bold text-white mt-1 block">
-                  {formatDuration(selectedTrip.durationMinutes)}
-                </span>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-                <span className="text-slate-400 block">Max Speed</span>
-                <span className="text-base font-bold text-rose-400 mt-1 block">
-                  {formatSpeed(selectedTrip.maxSpeedKmh)}
-                </span>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-                <span className="text-slate-400 block">Idle Time</span>
-                <span className="text-base font-bold text-amber-400 mt-1 block">
-                  {selectedTrip.idleMinutes} mins
-                </span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Right Column: Route Map & Playback Scrubbing Bar */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/60 backdrop-blur-md p-4 space-y-4">
-            {/* Map Canvas */}
-            <div className="h-96 w-full rounded-xl overflow-hidden border border-slate-800 relative">
-              <div ref={mapContainerRef} className="w-full h-full" />
-            </div>
-
-            {/* Playback Controls & Timeline Scrubber */}
-            <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant={isPlaying ? 'secondary' : 'primary'}
-                    icon={isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    onClick={() => setIsPlaying(!isPlaying)}
-                  >
-                    {isPlaying ? 'Pause' : 'Play Route'}
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    icon={<RotateCcw className="w-3.5 h-3.5" />}
-                    onClick={() => {
-                      setPlaybackIndex(0)
-                      setIsPlaying(false)
-                      if (markerRef.current && selectedTrip.routePoints[0]) {
-                        markerRef.current.setLatLng([
-                          selectedTrip.routePoints[0].lat,
-                          selectedTrip.routePoints[0].lng,
-                        ])
-                      }
-                    }}
-                  >
-                    Reset
-                  </Button>
-                </div>
-
-                {currentPoint && (
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="text-slate-400">
-                      Speed: <strong className="text-white">{formatSpeed(currentPoint.speedKmh)}</strong>
-                    </span>
-                    <span className="text-slate-500 font-mono">
-                      Waypoint {playbackIndex + 1} of {selectedTrip.routePoints.length}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Slider */}
-              <input
-                type="range"
-                min={0}
-                max={selectedTrip.routePoints.length - 1}
-                value={playbackIndex}
-                onChange={(e) => {
-                  const idx = Number(e.target.value)
-                  setPlaybackIndex(idx)
-                  const pt = selectedTrip.routePoints[idx]
-                  if (markerRef.current) markerRef.current.setLatLng([pt.lat, pt.lng])
-                }}
-                className="w-full accent-cyan-500 cursor-pointer"
-              />
-            </div>
+          {/* Date Range Picker */}
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
+            <Calendar className="w-4 h-4 text-slate-400" />
+            <span className="font-semibold text-slate-800">01-09-2025 - 16-09-2025</span>
           </div>
         </div>
+
+        <Button
+          variant="primary"
+          icon={<Download className="w-4 h-4" />}
+          onClick={exportCSV}
+        >
+          Export
+        </Button>
+      </div>
+
+      {/* Trips Table matching Mockup */}
+      <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
+        <DataTable
+          columns={columns}
+          data={HISTORIC_TRIPS}
+          keyExtractor={(t) => t.id}
+        />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={3}
+          totalItems={24}
+          pageSize={8}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   )

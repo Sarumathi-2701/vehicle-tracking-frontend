@@ -21,11 +21,11 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className="w-full text-left">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-medium text-slate-300 mb-1.5">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 mb-1.5">
           {label}
         </label>
       )}
-      <div className="relative rounded-xl shadow-sm">
+      <div className="relative rounded-xl shadow-2xs">
         {icon && (
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
             {icon}
@@ -33,18 +33,18 @@ export const Input: React.FC<InputProps> = ({
         )}
         <input
           id={inputId}
-          className={`block w-full rounded-xl bg-slate-950/70 border text-slate-100 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500 transition-all ${
+          className={`block w-full rounded-xl bg-slate-50 border text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:bg-white transition-all ${
             icon ? 'pl-10 pr-3.5 py-2.5' : 'px-3.5 py-2.5'
           } ${
             error
-              ? 'border-rose-500 text-rose-200 focus:ring-rose-500/40 focus:border-rose-500'
-              : 'border-slate-800 hover:border-slate-700'
+              ? 'border-rose-300 text-rose-800 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/30'
+              : 'border-slate-200 hover:border-slate-300'
           } ${className}`}
           {...props}
         />
       </div>
-      {error && <p className="mt-1.5 text-xs text-rose-400">{error}</p>}
-      {helperText && !error && <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>}
+      {error && <p className="mt-1.5 text-xs text-rose-500">{error}</p>}
+      {helperText && !error && <p className="mt-1.5 text-xs text-slate-400">{helperText}</p>}
     </div>
   )
 }

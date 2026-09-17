@@ -8,9 +8,10 @@ export interface StatsCardProps {
     value: string
     isPositive: boolean
   }
-  icon: React.ReactNode
+  icon?: React.ReactNode
   iconColorClass?: string
   onClick?: () => void
+  active?: boolean
 }
 
 export const StatsCard: React.FC<StatsCardProps> = ({
@@ -19,41 +20,41 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   subValue,
   trend,
   icon,
-  iconColorClass = 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  iconColorClass = 'bg-blue-50 text-blue-600',
   onClick,
+  active = false,
 }) => {
   return (
     <div
       onClick={onClick}
-      className={`p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-lg flex items-start justify-between transition duration-200 hover:border-slate-700 ${
-        onClick ? 'cursor-pointer hover:bg-slate-900/80' : ''
-      }`}
+      className={`p-4 sm:p-5 rounded-2xl bg-white border transition duration-200 shadow-xs flex items-center justify-between text-left ${
+        active ? 'border-blue-500 ring-2 ring-blue-500/10' : 'border-slate-200/80 hover:border-slate-300'
+      } ${onClick ? 'cursor-pointer' : ''}`}
     >
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</p>
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{value}</span>
-          {subValue && <span className="text-xs text-slate-400 font-normal">{subValue}</span>}
+        <span className="text-xs font-semibold text-slate-500">{label}</span>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            {value}
+          </span>
         </div>
-        {trend && (
-          <div className="mt-2.5 flex items-center gap-1.5 text-xs">
-            <span
-              className={`font-semibold ${
-                trend.isPositive ? 'text-emerald-400' : 'text-rose-400'
-              }`}
-            >
-              {trend.isPositive ? '↑' : '↓'} {trend.value}
-            </span>
-            <span className="text-slate-500">vs yesterday</span>
+        {(subValue || trend) && (
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs">
+            {trend && (
+              <span className={`font-semibold ${trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {trend.isPositive ? '▲' : '▼'} {trend.value}
+              </span>
+            )}
+            {subValue && <span className="text-slate-400 font-medium">{subValue}</span>}
           </div>
         )}
       </div>
 
-      <div
-        className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-inner ${iconColorClass}`}
-      >
-        {icon}
-      </div>
+      {icon && (
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${iconColorClass}`}>
+          {icon}
+        </div>
+      )}
     </div>
   )
 }

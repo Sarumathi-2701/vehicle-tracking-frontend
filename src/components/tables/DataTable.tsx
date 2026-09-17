@@ -27,16 +27,16 @@ export function DataTable<T>({
   if (isLoading) {
     return (
       <div className="py-16 text-center text-slate-400">
-        <div className="inline-block w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
-        <p className="text-sm">Loading telemetry records...</p>
+        <div className="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-3" />
+        <p className="text-xs">Loading records...</p>
       </div>
     )
   }
 
   return (
-    <div className="overflow-x-auto w-full">
-      <table className="w-full text-left text-sm text-slate-300">
-        <thead className="bg-slate-900/90 text-xs uppercase font-semibold text-slate-400 border-b border-slate-800">
+    <div className="overflow-x-auto w-full bg-white">
+      <table className="w-full text-left text-xs text-slate-700">
+        <thead className="bg-slate-50/80 text-[11px] uppercase font-bold text-slate-500 border-b border-slate-200">
           <tr>
             {columns.map((col) => (
               <th key={col.key} className={`px-5 py-3.5 ${col.className || ''}`}>
@@ -45,10 +45,10 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/60">
+        <tbody className="divide-y divide-slate-100">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-5 py-12 text-center text-slate-500">
+              <td colSpan={columns.length} className="px-5 py-12 text-center text-slate-400">
                 {emptyMessage}
               </td>
             </tr>
@@ -57,10 +57,10 @@ export function DataTable<T>({
               <tr
                 key={keyExtractor(row)}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`transition-colors duration-150 ${
+                className={`transition-colors duration-100 ${
                   onRowClick
-                    ? 'hover:bg-slate-800/50 cursor-pointer'
-                    : 'hover:bg-slate-900/30'
+                    ? 'hover:bg-slate-50/80 cursor-pointer'
+                    : 'hover:bg-slate-50/40'
                 }`}
               >
                 {columns.map((col) => (

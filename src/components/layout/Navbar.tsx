@@ -1,25 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Search, LogOut, Radio, Clock } from 'lucide-react'
+import { Bell, Search, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/features/auth/authStore'
 import { useTrackingStore } from '@/features/tracking/trackingStore'
-import { formatTimeOnly } from '@/utils/dateUtils'
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
-  const { alerts, isStreaming } = useTrackingStore()
-  const [currentTime, setCurrentTime] = useState(new Date().toISOString())
+  const { alerts } = useTrackingStore()
   const [showAlertMenu, setShowAlertMenu] = useState(false)
 
   const unreadAlerts = alerts.filter((a) => !a.isAcknowledged)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date().toISOString())
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
 
   const handleLogout = () => {
     logout()
@@ -27,56 +18,44 @@ export const Navbar: React.FC = () => {
   }
 
   return (
-    <header className="h-16 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
-      {/* Search & Telemetry status */}
-      <div className="flex items-center gap-4">
-        <div className="relative hidden md:block w-72">
+    <header className="h-16 border-b border-slate-200 bg-white sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+      {/* Search Input */}
+      <div className="flex items-center flex-1 max-w-md">
+        <div className="relative w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search vehicle, driver or plate..."
-            className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-900/80 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
+            placeholder="Search vehicles, drivers, locations..."
+            className="w-full pl-9 pr-4 py-2 text-xs rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-2xs"
           />
-        </div>
-
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800 text-xs text-slate-400">
-          <Clock className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="font-mono text-slate-200">{formatTimeOnly(currentTime)} UTC</span>
-        </div>
-
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs">
-          <Radio className={`w-3.5 h-3.5 ${isStreaming ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
-          <span className={isStreaming ? 'text-emerald-400 font-medium' : 'text-slate-500'}>
-            {isStreaming ? 'Live Stream' : 'Stream Paused'}
-          </span>
         </div>
       </div>
 
-      {/* Actions & User Menu */}
-      <div className="flex items-center gap-3">
-        {/* Alerts Bell Notification Popover */}
+      {/* Right User Actions */}
+      <div className="flex items-center gap-4">
+        {/* Notification Bell */}
         <div className="relative">
           <button
             onClick={() => setShowAlertMenu(!showAlertMenu)}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent hover:border-slate-800 transition relative cursor-pointer"
-            title="Alerts"
+            className="p-2 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition relative cursor-pointer"
+            title="Notifications"
           >
             <Bell className="w-5 h-5" />
             {unreadAlerts.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-slate-950 animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white" />
             )}
           </button>
 
           {showAlertMenu && (
-            <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl z-50 p-3 text-left animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                <span className="text-xs font-semibold text-white uppercase tracking-wider">
+            <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-slate-200 shadow-xl z-50 p-3 text-left animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider">
                   Recent Alerts ({unreadAlerts.length})
                 </span>
                 <Link
                   to="/alerts"
                   onClick={() => setShowAlertMenu(false)}
-                  className="text-xs text-cyan-400 hover:underline"
+                  className="text-xs text-blue-600 hover:underline font-medium"
                 >
                   View All
                 </Link>
@@ -86,13 +65,15 @@ export const Navbar: React.FC = () => {
                 {alerts.slice(0, 4).map((alert) => (
                   <div
                     key={alert.id}
-                    className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs"
+                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white">{alert.vehicleName}</span>
-                      <span className="text-[10px] text-slate-500">{new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="font-semibold text-slate-800">{alert.vehicleName}</span>
+                      <span className="text-[10px] text-slate-400">
+                        {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
-                    <p className="text-slate-400 mt-1 line-clamp-2">{alert.message}</p>
+                    <p className="text-slate-500 mt-1 line-clamp-2">{alert.message}</p>
                   </div>
                 ))}
               </div>
@@ -100,20 +81,29 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* User Card */}
-        <div className="flex items-center gap-3 pl-3 border-l border-slate-800">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white text-xs shadow-md">
-            {user?.name ? user.name.slice(0, 2).toUpperCase() : 'FL'}
+        {/* User Card Profile */}
+        <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
+          <div className="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-blue-700 text-xs shadow-xs overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+              alt="Admin"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+            <span>AD</span>
           </div>
+
           <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-semibold text-slate-100">{user?.name || 'Fleet Admin'}</span>
-            <span className="text-[10px] text-slate-400 capitalize">{user?.role?.replace('_', ' ') || 'Fleet Manager'}</span>
+            <span className="text-xs font-bold text-slate-800 leading-tight">Admin</span>
+            <span className="text-[11px] text-slate-400 font-medium">Super Admin</span>
           </div>
 
           <button
             onClick={handleLogout}
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
-            title="Log Out"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer ml-1"
+            title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
           </button>

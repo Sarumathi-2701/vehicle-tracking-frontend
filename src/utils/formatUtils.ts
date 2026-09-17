@@ -13,11 +13,6 @@ export function formatOdometer(odometerKm: number): string {
   return `${Math.round(odometerKm).toLocaleString()} km`
 }
 
-export function formatFuel(liters: number, capacity: number): string {
-  const pct = Math.round((liters / capacity) * 100)
-  return `${liters}L (${pct}%)`
-}
-
 export function getStatusBadgeConfig(status: VehicleStatus): {
   label: string
   bg: string
@@ -26,38 +21,40 @@ export function getStatusBadgeConfig(status: VehicleStatus): {
   dot: string
 } {
   switch (status) {
+    case 'running':
     case 'moving':
       return {
-        label: 'Moving',
-        bg: 'bg-emerald-500/10',
-        text: 'text-emerald-400',
-        border: 'border-emerald-500/30',
-        dot: 'bg-emerald-400',
+        label: 'Running',
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-600',
+        border: 'border-emerald-200',
+        dot: 'bg-emerald-500',
       }
     case 'idle':
       return {
         label: 'Idle',
-        bg: 'bg-amber-500/10',
-        text: 'text-amber-400',
-        border: 'border-amber-500/30',
-        dot: 'bg-amber-400',
+        bg: 'bg-amber-50',
+        text: 'text-amber-600',
+        border: 'border-amber-200',
+        dot: 'bg-amber-500',
       }
+    case 'parked':
     case 'stopped':
       return {
-        label: 'Stopped',
-        bg: 'bg-rose-500/10',
-        text: 'text-rose-400',
-        border: 'border-rose-500/30',
-        dot: 'bg-rose-400',
+        label: 'Parked',
+        bg: 'bg-blue-50',
+        text: 'text-blue-600',
+        border: 'border-blue-200',
+        dot: 'bg-blue-500',
       }
     case 'offline':
     default:
       return {
         label: 'Offline',
-        bg: 'bg-slate-700/30',
-        text: 'text-slate-400',
-        border: 'border-slate-700',
-        dot: 'bg-slate-500',
+        bg: 'bg-rose-50',
+        text: 'text-rose-600',
+        border: 'border-rose-200',
+        dot: 'bg-rose-500',
       }
   }
 }
@@ -72,24 +69,24 @@ export function getAlertSeverityConfig(severity: AlertSeverity): {
     case 'critical':
       return {
         label: 'Critical',
-        bg: 'bg-rose-500/15',
-        text: 'text-rose-400',
-        border: 'border-rose-500/30',
+        bg: 'bg-rose-50',
+        text: 'text-rose-600',
+        border: 'border-rose-200',
       }
     case 'warning':
       return {
         label: 'Warning',
-        bg: 'bg-amber-500/15',
-        text: 'text-amber-400',
-        border: 'border-amber-500/30',
+        bg: 'bg-amber-50',
+        text: 'text-amber-600',
+        border: 'border-amber-200',
       }
     case 'info':
     default:
       return {
         label: 'Info',
-        bg: 'bg-cyan-500/15',
-        text: 'text-cyan-400',
-        border: 'border-cyan-500/30',
+        bg: 'bg-blue-50',
+        text: 'text-blue-600',
+        border: 'border-blue-200',
       }
   }
 }

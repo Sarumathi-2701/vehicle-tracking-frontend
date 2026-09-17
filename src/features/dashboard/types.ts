@@ -1,11 +1,11 @@
 export interface DashboardMetrics {
   totalVehicles: number
-  activeMoving: number
+  runningVehicles: number
   idleVehicles: number
-  stoppedVehicles: number
+  parkedVehicles: number
   offlineVehicles: number
-  activeAlerts: number
-  fleetDistanceKmToday: number
-  averageFleetSpeedKmh: number
-  averageFuelConsumptionL100Km: number
+  totalDistanceKm: number
+  totalTrips: number
+  avgSpeedKmh: number
+  fuelUsageLiters: number
 }

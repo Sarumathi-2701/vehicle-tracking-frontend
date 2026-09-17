@@ -1,17 +1,27 @@
-import { DashboardMetrics } from '../types'
+export interface DashboardMetrics {
+  totalVehicles: number
+  runningVehicles: number
+  idleVehicles: number
+  parkedVehicles: number
+  offlineVehicles: number
+  totalDistanceKm: number
+  totalTrips: number
+  avgSpeedKmh: number
+  fuelUsageLiters: number
+}
 
 export const dashboardService = {
   async getMetrics(): Promise<DashboardMetrics> {
     return {
-      totalVehicles: 6,
-      activeMoving: 3,
-      idleVehicles: 1,
-      stoppedVehicles: 1,
+      totalVehicles: 24,
+      runningVehicles: 16,
+      idleVehicles: 5,
+      parkedVehicles: 2,
       offlineVehicles: 1,
-      activeAlerts: 3,
-      fleetDistanceKmToday: 1420.8,
-      averageFleetSpeedKmh: 48.5,
-      averageFuelConsumptionL100Km: 26.4,
+      totalDistanceKm: 18460,
+      totalTrips: 612,
+      avgSpeedKmh: 56,
+      fuelUsageLiters: 3420,
     }
   },
 }

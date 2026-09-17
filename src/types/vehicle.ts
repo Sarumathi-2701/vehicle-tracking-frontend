@@ -1,6 +1,6 @@
-export type VehicleType = 'truck' | 'van' | 'car' | 'bus' | 'motorcycle'
+export type VehicleType = 'truck' | 'van' | 'car' | 'bus' | 'lorry' | 'motorcycle'
 
-export type VehicleStatus = 'moving' | 'idle' | 'stopped' | 'offline'
+export type VehicleStatus = 'running' | 'moving' | 'idle' | 'parked' | 'stopped' | 'offline'
 
 export interface Driver {
   id: string
@@ -21,12 +21,17 @@ export interface Vehicle {
   vin: string
   deviceImei: string
   simCardNumber: string
+  locationCity: string
   assignedDriver?: Driver
   status: VehicleStatus
   lastUpdated: string
   fuelCapacityLiters: number
   currentFuelLiters: number
+  fuelPercent: number
   odometerKm: number
   speedLimitKmh: number
   currentSpeedKmh: number
+  headingDeg: number
+  latitude: number
+  longitude: number
 }

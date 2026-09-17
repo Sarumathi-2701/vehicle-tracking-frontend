@@ -8,6 +8,7 @@ import VehiclesPage from '@/features/vehicles/pages/VehiclesPage'
 import TripHistoryPage from '@/features/trips/TripHistoryPage'
 import AlertsPage from '@/features/alerts/AlertsPage'
 import ReportsPage from '@/features/reports/ReportsPage'
+import GeofencesPage from '@/features/geofences/GeofencesPage'
 import SettingsPage from '@/features/settings/SettingsPage'
 import { useAuthStore } from '@/features/auth/authStore'
 
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path: 'reports',
         element: <ReportsPage />,
+      },
+      {
+        path: 'geofences',
+        element: <GeofencesPage />,
       },
       {
         path: 'settings',

@@ -1,130 +1,116 @@
 import React, { useState } from 'react'
-import { Settings, Bell, Map, Sliders, Check } from 'lucide-react'
+import { User, Bell, Shield, Eye, Database, Check } from 'lucide-react'
 import PageHeader from '@/components/layout/PageHeader'
 import Card from '@/components/common/Card'
 import Button from '@/components/common/Button'
-import Switch from '@/components/forms/Switch'
 import Input from '@/components/forms/Input'
-import Select from '@/components/forms/Select'
-import { useAppStore } from '@/store/appStore'
 
 export const SettingsPage: React.FC = () => {
-  const { mapStyle, setMapStyle, speedUnit, setSpeedUnit } = useAppStore()
-
+  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'security' | 'appearance' | 'api'>('profile')
+  const [name, setName] = useState('Admin')
+  const [email, setEmail] = useState('admin@company.com')
+  const [phone, setPhone] = useState('+91 98765 43210')
   const [saved, setSaved] = useState(false)
-  const [speedLimitDefault, setSpeedLimitDefault] = useState(80)
-  const [pollingRate, setPollingRate] = useState('2.5')
-  const [alertOverspeed, setAlertOverspeed] = useState(true)
-  const [alertGeofence, setAlertGeofence] = useState(true)
-  const [alertLowFuel, setAlertLowFuel] = useState(true)
-  const [alertLowBattery, setAlertLowBattery] = useState(true)
 
-  const handleSave = () => {
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault()
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
 
+  const tabs = [
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'appearance', label: 'Appearance', icon: Eye },
+    { id: 'api', label: 'API Integration', icon: Database },
+  ]
+
   return (
-    <div className="space-y-6 text-left max-w-4xl">
+    <div className="space-y-6 text-left max-w-5xl">
       <PageHeader
-        title="Telematics System Settings"
-        subtitle="Configure real-time GPS telemetry refresh rates, thresholds, map styles, and alert notifications"
-        action={
-          <Button
-            variant="primary"
-            icon={saved ? <Check className="w-4 h-4 text-emerald-300" /> : undefined}
-            onClick={handleSave}
-          >
-            {saved ? 'Preferences Saved!' : 'Save Changes'}
-          </Button>
-        }
+        title="Settings"
+        subtitle="Manage account preferences, alerts triggers, and system configuration"
       />
 
-      {/* Map & Visual Settings */}
-      <Card title="Map & Display Preferences" subtitle="Customize the live map tracking layers and telemetry visualization">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select
-              label="Default Map Style"
-              value={mapStyle}
-              onChange={(e) => setMapStyle(e.target.value as any)}
-              options={[
-                { value: 'dark', label: 'Dark High-Contrast Theme (Recommended)' },
-                { value: 'streets', label: 'OpenStreetMap Streets (Standard)' },
-              ]}
-            />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+        {/* Left Vertical Tabs matching Mockup Screen 9 */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-2 space-y-1 shadow-xs">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const isSelected = activeTab === tab.id
 
-            <Select
-              label="Speed Units"
-              value={speedUnit}
-              onChange={(e) => setSpeedUnit(e.target.value as any)}
-              options={[
-                { value: 'kmh', label: 'Kilometers per hour (km/h)' },
-                { value: 'mph', label: 'Miles per hour (mph)' },
-              ]}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <Select
-              label="Telemetry Polling Interval"
-              value={pollingRate}
-              onChange={(e) => setPollingRate(e.target.value)}
-              options={[
-                { value: '1.0', label: '1.0s (Ultra High Frequency)' },
-                { value: '2.5', label: '2.5s (Standard Real-Time)' },
-                { value: '5.0', label: '5.0s (Bandwidth Saver)' },
-              ]}
-            />
-
-            <Input
-              label="Global Overspeed Alert Threshold (km/h)"
-              type="number"
-              value={speedLimitDefault}
-              onChange={(e) => setSpeedLimitDefault(Number(e.target.value))}
-            />
-          </div>
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
+                  isSelected
+                    ? 'bg-blue-50 text-blue-600 font-bold'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
-      </Card>
 
-      {/* Alert Notifications */}
-      <Card title="Automated Alert Triggers" subtitle="Toggle automated telemetry violation triggers">
-        <div className="space-y-4">
-          <Switch
-            checked={alertOverspeed}
-            onChange={setAlertOverspeed}
-            label="Overspeeding Trigger"
-            description="Generate immediate alert when any vehicle crosses the designated speed limit"
-          />
+        {/* Right Settings Form matching Mockup Screen 9 */}
+        <div className="md:col-span-3">
+          <Card title="Profile Settings" subtitle="Update your system administrator identity and credentials">
+            <form onSubmit={handleSave} className="space-y-5">
+              {/* Profile Avatar Banner */}
+              <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
+                <div className="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-500 overflow-hidden shrink-0 shadow-sm">
+                  <img
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80"
+                    alt="Admin"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">{name}</h4>
+                  <span className="text-xs text-slate-500">Super Admin</span>
+                </div>
+              </div>
 
-          <div className="border-t border-slate-800/80 pt-3">
-            <Switch
-              checked={alertGeofence}
-              onChange={setAlertGeofence}
-              label="Geofence Boundary Violations"
-              description="Notify dispatch when a vehicle enters or exits a restricted customer or logistics zone"
-            />
-          </div>
+              <Input
+                label="Admin Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
 
-          <div className="border-t border-slate-800/80 pt-3">
-            <Switch
-              checked={alertLowFuel}
-              onChange={setAlertLowFuel}
-              label="Critical Low Fuel Alerts"
-              description="Alert when fuel level dips below 15% of tank capacity"
-            />
-          </div>
+              <Input
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-          <div className="border-t border-slate-800/80 pt-3">
-            <Switch
-              checked={alertLowBattery}
-              onChange={setAlertLowBattery}
-              label="Vehicle Battery Voltage Drop"
-              description="Warn if battery voltage drops below 11.8V (12V system) or 23.6V (24V system)"
-            />
-          </div>
+              <Input
+                label="Phone Number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+
+              <div className="pt-2 flex justify-start">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  icon={saved ? <Check className="w-4 h-4 text-emerald-200" /> : undefined}
+                >
+                  {saved ? 'Changes Saved!' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          </Card>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
