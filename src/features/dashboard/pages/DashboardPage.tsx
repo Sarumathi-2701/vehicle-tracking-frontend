@@ -21,12 +21,6 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-left">
-      {/* Page Title */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Dashboard</h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Overview of your fleet</p>
-      </div>
-
       {/* Row of 5 Status KPI Cards matching Mockup */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         <StatsCard

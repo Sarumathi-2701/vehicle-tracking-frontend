@@ -5,6 +5,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: string
   helperText?: string
   icon?: React.ReactNode
+  rightElement?: React.ReactNode
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -12,6 +13,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   helperText,
   icon,
+  rightElement,
   className = '',
   id,
   ...props
@@ -21,7 +23,7 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className="w-full text-left">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 mb-1.5">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 mb-1">
           {label}
         </label>
       )}
@@ -34,17 +36,24 @@ export const Input: React.FC<InputProps> = ({
         <input
           id={inputId}
           className={`block w-full rounded-xl bg-slate-50 border text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:bg-white transition-all ${
-            icon ? 'pl-10 pr-3.5 py-2.5' : 'px-3.5 py-2.5'
+            icon ? 'pl-10' : 'pl-3.5'
           } ${
+            rightElement ? 'pr-10' : 'pr-3.5'
+          } py-2 sm:py-2.5 ${
             error
               ? 'border-rose-300 text-rose-800 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/30'
               : 'border-slate-200 hover:border-slate-300'
           } ${className}`}
           {...props}
         />
+        {rightElement && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+            {rightElement}
+          </div>
+        )}
       </div>
-      {error && <p className="mt-1.5 text-xs text-rose-500">{error}</p>}
-      {helperText && !error && <p className="mt-1.5 text-xs text-slate-400">{helperText}</p>}
+      {error && <p className="mt-1 text-xs text-rose-500">{error}</p>}
+      {helperText && !error && <p className="mt-1 text-xs text-slate-400">{helperText}</p>}
     </div>
   )
 }

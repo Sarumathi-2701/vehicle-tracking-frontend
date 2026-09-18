@@ -75,3 +75,15 @@
 .vehicle-pulse {
   animation: pulseGlowLight 2s infinite;
 }
+
+/* Custom Leaflet Hover Tooltip */
+.custom-vehicle-hover-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.custom-vehicle-hover-tooltip::before {
+  display: none !important;
+}

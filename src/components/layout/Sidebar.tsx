@@ -53,42 +53,58 @@ export const Sidebar: React.FC = () => {
           sidebarOpen ? 'lg:w-64' : 'lg:w-20'
         }`}
       >
+        {/* Floating Collapse/Expand Button for Desktop */}
+        <button
+          onClick={toggleSidebar}
+          className="hidden lg:flex absolute -right-3 top-7 w-6 h-6 rounded-full bg-blue-600 text-white items-center justify-center shadow-lg border-2 border-[#0B132B] hover:bg-blue-500 hover:scale-110 transition cursor-pointer z-50"
+          title={sidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+        >
+          {sidebarOpen ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+        </button>
+
         <div>
           {/* Brand Header */}
-          <div className="h-20 px-4 flex items-center justify-between border-b border-slate-800/80">
-            <div className="flex items-center gap-3 overflow-hidden text-left">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 text-white">
-                <MapPin className="w-5 h-5 fill-white text-blue-600" />
-              </div>
-              {(sidebarOpen || mobileSidebarOpen) && (
+          <div
+            className={`h-20 border-b border-slate-800/80 flex items-center ${
+              sidebarOpen || mobileSidebarOpen
+                ? 'px-4 justify-between'
+                : 'justify-center px-0'
+            }`}
+          >
+            {sidebarOpen || mobileSidebarOpen ? (
+              <div className="flex items-center gap-3 overflow-hidden text-left">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 text-white">
+                  <MapPin className="w-5 h-5 fill-white text-blue-600" />
+                </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-sm text-white tracking-tight leading-snug">
+                  <span className="font-bold text-sm text-white tracking-tight leading-snug truncate">
                     GPS Vehicle Tracking
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium tracking-wide">
+                  <span className="text-[10px] text-slate-400 font-medium tracking-wide truncate">
                     Track • Monitor • Manage
                   </span>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <button
+                onClick={toggleSidebar}
+                className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 text-white hover:bg-blue-500 transition cursor-pointer"
+                title="Expand Menu"
+              >
+                <MapPin className="w-5 h-5 fill-white text-blue-600" />
+              </button>
+            )}
 
             {/* Close button on mobile */}
-            <button
-              onClick={() => setMobileSidebarOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
-              title="Close Menu"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Desktop collapse button */}
-            <button
-              onClick={toggleSidebar}
-              className="hidden lg:block p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
-              title={sidebarOpen ? 'Collapse Menu' : 'Expand Menu'}
-            >
-              {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
+            {mobileSidebarOpen && (
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
+                title="Close Menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Navigation Links */}
@@ -101,7 +117,11 @@ export const Sidebar: React.FC = () => {
                   to={item.path}
                   onClick={() => setMobileSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-semibold transition-all group relative ${
+                    `flex items-center py-3 rounded-xl text-xs font-semibold transition-all group relative ${
+                      sidebarOpen || mobileSidebarOpen
+                        ? 'gap-3.5 px-3.5'
+                        : 'justify-center px-0'
+                    } ${
                       isActive
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
