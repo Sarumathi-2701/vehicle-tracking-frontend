@@ -9,17 +9,17 @@ export const MainLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex">
-      {/* Persistent Dark Navy Sidebar */}
+      {/* Persistent Desktop Sidebar / Slide-out Mobile Drawer */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-20'
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ml-0 ${
+          sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'
         }`}
       >
         <Navbar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-5 lg:p-7 max-w-[1600px] w-full mx-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

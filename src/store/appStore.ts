@@ -13,6 +13,10 @@ interface AppState {
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
 
+  mobileSidebarOpen: boolean
+  toggleMobileSidebar: () => void
+  setMobileSidebarOpen: (open: boolean) => void
+
   toasts: ToastMessage[]
   addToast: (toast: Omit<ToastMessage, 'id'>) => void
   removeToast: (id: string) => void
@@ -28,6 +32,10 @@ export const useAppStore = create<AppState>((set) => ({
   sidebarOpen: true,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+  mobileSidebarOpen: false,
+  toggleMobileSidebar: () => set((state) => ({ mobileSidebarOpen: !state.mobileSidebarOpen })),
+  setMobileSidebarOpen: (open) => set({ mobileSidebarOpen: open }),
 
   toasts: [],
   addToast: (toast) => {
@@ -46,7 +54,7 @@ export const useAppStore = create<AppState>((set) => ({
       toasts: state.toasts.filter((t) => t.id !== id),
     })),
 
-  mapStyle: 'dark',
+  mapStyle: 'streets',
   setMapStyle: (style) => set({ mapStyle: style }),
 
   speedUnit: 'kmh',

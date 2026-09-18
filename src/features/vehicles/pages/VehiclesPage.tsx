@@ -14,11 +14,12 @@ import { usePagination } from '@/hooks/usePagination'
 
 export const VehiclesPage: React.FC = () => {
   const { vehicles, filters, setFilter, addVehicle, deleteVehicle } = useVehicles()
-  const { liveTelemetry, setSelectedVehicleId } = useLiveTracking()
+  const { liveTelemetry } = useLiveTracking()
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [inspectVehicle, setInspectVehicle] = useState<Vehicle | null>(null)
 
+  // Use bulletproof pagination hook with reset trigger on filter changes
   const {
     paginatedItems,
     currentPage,
@@ -26,7 +27,11 @@ export const VehiclesPage: React.FC = () => {
     totalItems,
     pageSize,
     goToPage,
-  } = usePagination({ items: vehicles, initialPageSize: 8 })
+  } = usePagination({
+    items: vehicles,
+    initialPageSize: 8,
+    resetTrigger: `${filters.search}_${filters.status}_${filters.type}`,
+  })
 
   const columns: Column<Vehicle>[] = [
     {
@@ -128,8 +133,8 @@ export const VehiclesPage: React.FC = () => {
         }
       />
 
-      {/* Filter Bar matching Mockup */}
-      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      {/* Filter Bar */}
+      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -143,7 +148,7 @@ export const VehiclesPage: React.FC = () => {
         </div>
 
         {/* Dropdown Filters */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <select
             value={filters.status}
             onChange={(e) => setFilter('status', e.target.value)}
@@ -171,7 +176,7 @@ export const VehiclesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Clean White Table matching Mockup */}
+      {/* Clean White Table with Dynamic Sliced Pagination */}
       <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
         <DataTable
           columns={columns}
@@ -184,6 +189,7 @@ export const VehiclesPage: React.FC = () => {
           totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={goToPage}
+          itemLabel="vehicles"
         />
       </div>
 
