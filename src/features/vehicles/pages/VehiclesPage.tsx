@@ -90,27 +90,27 @@ export const VehiclesPage: React.FC = () => {
       header: 'Actions',
       className: 'text-right',
       render: (veh) => (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-1">
           <button
             onClick={() => setInspectVehicle(veh)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+            className="p-1 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
             title="View Details"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setInspectVehicle(veh)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
             title="Edit"
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => deleteVehicle(veh.id)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+            className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
             title="Delete"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       ),
@@ -134,7 +134,7 @@ export const VehiclesPage: React.FC = () => {
       />
 
       {/* Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -176,12 +176,13 @@ export const VehiclesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Clean White Table with Dynamic Sliced Pagination */}
+      {/* Clean White Table with Dynamic Sliced Pagination & Compact Row Height */}
       <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
         <DataTable
           columns={columns}
           data={paginatedItems}
           keyExtractor={(veh) => veh.id}
+          compact={true}
         />
         <Pagination
           currentPage={currentPage}

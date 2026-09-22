@@ -38,7 +38,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3.5 bg-white border-t border-slate-200 text-xs text-slate-500">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-2.5 bg-white border-t border-slate-200 text-xs text-slate-500">
       <div className="flex items-center gap-2">
         <span>
           Showing <span className="font-bold text-slate-900">{startItem}-{endItem}</span> of{' '}

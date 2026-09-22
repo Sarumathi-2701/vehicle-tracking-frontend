@@ -4,6 +4,7 @@ import { MapPin, Plus, Radio, ShieldCheck, ChevronRight } from 'lucide-react'
 import PageHeader from '@/components/layout/PageHeader'
 import Button from '@/components/common/Button'
 import Card from '@/components/common/Card'
+import CreateGeofenceModal, { GeofenceZoneData } from './components/CreateGeofenceModal'
 
 interface GeofenceZone {
   id: string
@@ -16,7 +17,7 @@ interface GeofenceZone {
   polygonPoints?: [number, number][]
 }
 
-const GEOFENCE_ZONES: GeofenceZone[] = [
+const INITIAL_GEOFENCE_ZONES: GeofenceZone[] = [
   {
     id: 'geo-01',
     name: 'Chennai City',
@@ -67,7 +68,9 @@ const GEOFENCE_ZONES: GeofenceZone[] = [
 ]
 
 export const GeofencesPage: React.FC = () => {
-  const [selectedZone, setSelectedZone] = useState<GeofenceZone>(GEOFENCE_ZONES[0])
+  const [zones, setZones] = useState<GeofenceZone[]>(INITIAL_GEOFENCE_ZONES)
+  const [selectedZone, setSelectedZone] = useState<GeofenceZone>(INITIAL_GEOFENCE_ZONES[0])
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const layerGroupRef = useRef<L.LayerGroup | null>(null)
@@ -76,17 +79,19 @@ export const GeofencesPage: React.FC = () => {
   useEffect(() => {
     if (!mapContainerRef.current) return
 
-    if (!mapRef.current) {
-      const map = L.map(mapContainerRef.current, {
+    let map = mapRef.current
+    if (!map) {
+      map = L.map(mapContainerRef.current, {
         center: selectedZone.center,
         zoom: 11,
         zoomControl: false,
+        attributionControl: false,
       })
 
       L.control.zoom({ position: 'bottomright' }).addTo(map)
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map)
 
@@ -94,7 +99,15 @@ export const GeofencesPage: React.FC = () => {
       mapRef.current = map
     }
 
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize()
+      }
+    })
+    resizeObserver.observe(mapContainerRef.current)
+
     return () => {
+      resizeObserver.disconnect()
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
@@ -110,7 +123,7 @@ export const GeofencesPage: React.FC = () => {
 
     layerGroup.clearLayers()
 
-    GEOFENCE_ZONES.forEach((zone) => {
+    zones.forEach((zone) => {
       const isSelected = zone.id === selectedZone.id
 
       if (zone.type === 'Circle' && zone.radiusMeters) {
@@ -143,7 +156,18 @@ export const GeofencesPage: React.FC = () => {
 
     // Pan to selected
     map.panTo(selectedZone.center, { animate: true, duration: 0.6 })
-  }, [selectedZone])
+  }, [selectedZone, zones])
+
+  const handleCreateGeofence = (newZoneData: GeofenceZoneData) => {
+    const newZone: GeofenceZone = {
+      ...newZoneData,
+    }
+    setZones((prev) => [newZone, ...prev])
+    setSelectedZone(newZone)
+    if (mapRef.current) {
+      mapRef.current.setView(newZone.center, 12, { animate: true })
+    }
+  }
 
   return (
     <div className="space-y-6 text-left">
@@ -151,18 +175,22 @@ export const GeofencesPage: React.FC = () => {
         title="Geofences"
         subtitle="Manage virtual boundary security zones, checkpoints, and entry/exit alerts"
         action={
-          <Button variant="primary" icon={<Plus className="w-4 h-4" />}>
+          <Button
+            variant="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             Create Geofence
           </Button>
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {/* Left Column: Zone List matching Mockup */}
-        <div className="space-y-3">
-          <Card title={`Active Zones (${GEOFENCE_ZONES.length})`}>
-            <div className="space-y-2.5">
-              {GEOFENCE_ZONES.map((zone) => {
+        <div className="space-y-3 flex flex-col justify-between h-full">
+          <Card title={`Active Zones (${zones.length})`}>
+            <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              {zones.map((zone) => {
                 const isSelected = zone.id === selectedZone.id
 
                 return (
@@ -211,12 +239,19 @@ export const GeofencesPage: React.FC = () => {
         </div>
 
         {/* Right 2 Columns: Map Canvas */}
-        <div className="lg:col-span-2">
-          <div className="h-[560px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-white relative">
-            <div ref={mapContainerRef} className="w-full h-full" />
+        <div className="lg:col-span-2 flex flex-col h-full">
+          <div className="flex-1 w-full h-full min-h-[560px] rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-white relative">
+            <div ref={mapContainerRef} className="w-full h-full min-h-[560px]" />
           </div>
         </div>
       </div>
+
+      {/* Create Geofence Modal */}
+      <CreateGeofenceModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateGeofence}
+      />
     </div>
   )
 }

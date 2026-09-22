@@ -111,15 +111,15 @@ export const FleetStatusChart: React.FC<FleetStatusChartProps> = ({
         </div>
 
         {/* Breakdown Legend Table */}
-        <div className="space-y-2.5 w-full max-w-[180px] text-xs">
+        <div className="space-y-2.5 w-full max-w-[200px] text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
               <span className="text-slate-600 font-medium">Running</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{running}</span>
-              <span className="text-[10px] text-slate-400">({runningPct.toFixed(1)}%)</span>
+            <div className="flex items-center gap-1.5 tabular-nums">
+              <span className="font-bold text-slate-800 w-6 text-right">{running}</span>
+              <span className="text-[11px] text-slate-400 w-14 text-right">({runningPct.toFixed(1)}%)</span>
             </div>
           </div>
 
@@ -128,9 +128,9 @@ export const FleetStatusChart: React.FC<FleetStatusChartProps> = ({
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
               <span className="text-slate-600 font-medium">Idle</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{idle}</span>
-              <span className="text-[10px] text-slate-400">({idlePct.toFixed(1)}%)</span>
+            <div className="flex items-center gap-1.5 tabular-nums">
+              <span className="font-bold text-slate-800 w-6 text-right">{idle}</span>
+              <span className="text-[11px] text-slate-400 w-14 text-right">({idlePct.toFixed(1)}%)</span>
             </div>
           </div>
 
@@ -139,9 +139,9 @@ export const FleetStatusChart: React.FC<FleetStatusChartProps> = ({
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
               <span className="text-slate-600 font-medium">Parked</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{parked}</span>
-              <span className="text-[10px] text-slate-400">({parkedPct.toFixed(1)}%)</span>
+            <div className="flex items-center gap-1.5 tabular-nums">
+              <span className="font-bold text-slate-800 w-6 text-right">{parked}</span>
+              <span className="text-[11px] text-slate-400 w-14 text-right">({parkedPct.toFixed(1)}%)</span>
             </div>
           </div>
 
@@ -150,9 +150,9 @@ export const FleetStatusChart: React.FC<FleetStatusChartProps> = ({
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span className="text-slate-600 font-medium">Offline</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{offline}</span>
-              <span className="text-[10px] text-slate-400">({offlinePct.toFixed(1)}%)</span>
+            <div className="flex items-center gap-1.5 tabular-nums">
+              <span className="font-bold text-slate-800 w-6 text-right">{offline}</span>
+              <span className="text-[11px] text-slate-400 w-14 text-right">({offlinePct.toFixed(1)}%)</span>
             </div>
           </div>
         </div>

@@ -64,22 +64,22 @@ export const DashboardPage: React.FC = () => {
         />
       </div>
 
-      {/* Main Grid: Left Map + Right Charts & Feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      {/* Main Grid: Left Map + Right Charts & Feed with clean height alignment */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {/* Left 2 Cols: Main Live Map */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 h-full flex flex-col">
           <VehicleMap
             vehicles={vehicles}
             liveTelemetry={liveTelemetry}
             selectedVehicleId={selectedVehicleId}
             onSelectVehicle={setSelectedVehicleId}
-            height="560px"
             showFilterPills={true}
+            className="h-full"
           />
         </div>
 
         {/* Right 1 Col: Vehicle Status Donut + Recent Alerts */}
-        <div className="space-y-6">
+        <div className="flex flex-col justify-between gap-6 h-full">
           <FleetStatusChart
             total={metrics?.totalVehicles || 24}
             running={metrics?.runningVehicles || 16}

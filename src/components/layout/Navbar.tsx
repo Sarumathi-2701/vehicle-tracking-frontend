@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Bell, Search, LogOut, Menu } from 'lucide-react'
 import { useAuthStore } from '@/features/auth/authStore'
 import { useTrackingStore } from '@/features/tracking/trackingStore'
@@ -7,11 +7,13 @@ import { useAppStore } from '@/store/appStore'
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuthStore()
   const { alerts } = useTrackingStore()
   const { toggleMobileSidebar } = useAppStore()
   const [showAlertMenu, setShowAlertMenu] = useState(false)
 
+  const isVehiclesPage = location.pathname === '/vehicles'
   const unreadAlerts = alerts.filter((a) => !a.isAcknowledged)
 
   const handleLogout = () => {
@@ -31,14 +33,16 @@ export const Navbar: React.FC = () => {
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="relative w-full">
-          <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search vehicles, drivers, locations..."
-            className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-1.5 sm:py-2 text-xs rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-2xs"
-          />
-        </div>
+        {!isVehiclesPage && (
+          <div className="relative w-full">
+            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search vehicles, drivers, locations..."
+              className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-1.5 sm:py-2 text-xs rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-2xs"
+            />
+          </div>
+        )}
       </div>
 
       {/* Right User Actions */}

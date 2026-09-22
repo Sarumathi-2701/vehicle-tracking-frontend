@@ -3,7 +3,6 @@ import L from 'leaflet'
 import { Vehicle } from '@/types/vehicle'
 import { VehicleTelemetry, GpsLocation, Geofence } from '@/types/gps'
 import MapControls from './MapControls'
-import { formatSpeed } from '@/utils/formatUtils'
 
 export interface VehicleMapProps {
   vehicles: Vehicle[]
@@ -17,6 +16,7 @@ export interface VehicleMapProps {
   isStreaming?: boolean
   onToggleStream?: () => void
   showFilterPills?: boolean
+  className?: string
 }
 
 export const VehicleMap: React.FC<VehicleMapProps> = ({
@@ -31,6 +31,7 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
   isStreaming = true,
   onToggleStream = () => {},
   showFilterPills = true,
+  className = '',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
@@ -46,26 +47,44 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current) return
 
-    if (!mapRef.current) {
+    let map = mapRef.current
+    if (!map) {
       // Default to Chennai coordinates (13.0827, 80.2707) matching the mockup
-      const map = L.map(mapContainerRef.current, {
+      map = L.map(mapContainerRef.current, {
         center: [13.0827, 80.2707],
         zoom: 12,
         zoomControl: false,
+        attributionControl: false,
       })
 
       L.control.zoom({ position: 'bottomright' }).addTo(map)
 
-      // Use Carto Voyager Light Tiles matching mockup
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
+      // Use OpenStreetMap clean tiles (no watermark, no API key required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map)
 
       mapRef.current = map
     }
 
+    // Automatically invalidate and adapt map size whenever container stretches or window resizes
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize()
+      }
+    })
+    resizeObserver.observe(mapContainerRef.current)
+
+    const timer = setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize()
+      }
+    }, 100)
+
     return () => {
+      clearTimeout(timer)
+      resizeObserver.disconnect()
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
@@ -380,40 +399,14 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
           if (onSelectVehicle) onSelectVehicle(veh.id)
         })
 
-        // Rich Hover Tooltip showing vehicle details
+        // Single Rich Hover Tooltip showing vehicle details
         marker.bindTooltip(createTooltipContent(veh, telemetry), {
           direction: 'top',
-          offset: [0, -20],
+          offset: [0, -22],
           className: 'custom-vehicle-hover-tooltip',
           opacity: 1,
         })
 
-        // Popup matching mockup on click
-        const popupContent = `
-          <div class="p-3 text-xs font-sans min-w-[210px]">
-            <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <span class="font-bold text-slate-800 text-sm">${veh.plateNumber}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-600 border border-emerald-200">
-                ${veh.status}
-              </span>
-            </div>
-            <div class="mt-2 space-y-1 text-slate-600">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Speed:</span>
-                <span class="font-bold text-slate-800">${formatSpeed(telemetry?.location?.speedKmh ?? veh.currentSpeedKmh)}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Driver:</span>
-                <span class="font-medium text-slate-800">${veh.assignedDriver?.name || 'Unassigned'}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Location:</span>
-                <span class="font-medium text-slate-800">${veh.locationCity || 'Chennai'}</span>
-              </div>
-            </div>
-          </div>
-        `
-        marker.bindPopup(popupContent)
         markersRef.current[veh.id] = marker
       } else {
         const marker = markersRef.current[veh.id]
@@ -490,8 +483,11 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
   }
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-white" style={{ height }}>
-      <div ref={mapContainerRef} className="w-full h-full" />
+    <div
+      className={`relative w-full flex-1 flex flex-col rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-white ${className}`}
+      style={height && height !== '100%' ? { height } : undefined}
+    >
+      <div ref={mapContainerRef} className="w-full flex-1 h-full min-h-[460px]" />
 
       {/* Floating Controls */}
       <MapControls
@@ -506,9 +502,9 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
         onToggleMapStyle={() => {}}
       />
 
-      {/* Bottom Status Filter Pills matching Mockup */}
+      {/* Top Status Filter Pills matching Mockup */}
       {showFilterPills && (
-        <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200 shadow-md flex items-center gap-3 text-xs font-semibold">
+        <div className="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200 shadow-md flex items-center gap-3 text-xs font-semibold">
           <button
             onClick={() => setStatusFilter('all')}
             className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full transition cursor-pointer ${

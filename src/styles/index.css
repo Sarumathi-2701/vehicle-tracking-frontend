@@ -87,3 +87,8 @@
 .custom-vehicle-hover-tooltip::before {
   display: none !important;
 }
+
+/* Completely hide Leaflet / OpenStreetMap attribution control */
+.leaflet-control-attribution {
+  display: none !important;
+}

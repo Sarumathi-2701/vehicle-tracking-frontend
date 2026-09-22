@@ -177,6 +177,7 @@ export const TripHistoryPage: React.FC = () => {
           columns={columns}
           data={paginatedItems}
           keyExtractor={(t) => t.id}
+          compact={true}
         />
         <Pagination
           currentPage={currentPage}

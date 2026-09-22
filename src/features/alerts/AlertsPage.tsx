@@ -155,6 +155,7 @@ export const AlertsPage: React.FC = () => {
           columns={columns}
           data={paginatedItems}
           keyExtractor={(a) => a.id}
+          compact={true}
         />
         <Pagination
           currentPage={currentPage}

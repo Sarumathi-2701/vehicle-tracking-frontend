@@ -94,7 +94,7 @@ export const LiveTrackingPage: React.FC = () => {
 
         {/* Center: Full-Screen Interactive Leaflet Map */}
         <div
-          className={`flex-1 h-full relative z-0 ${
+          className={`flex-1 h-full relative z-0 flex flex-col ${
             mobileView === 'map' ? 'w-full block' : 'hidden lg:block'
           }`}
         >
@@ -107,8 +107,8 @@ export const LiveTrackingPage: React.FC = () => {
             geofences={geofences}
             isStreaming={isStreaming}
             onToggleStream={isStreaming ? stopStream : startStream}
-            height="100%"
             showFilterPills={true}
+            className="h-full rounded-none border-x border-y-0 border-slate-200"
           />
         </div>
 
