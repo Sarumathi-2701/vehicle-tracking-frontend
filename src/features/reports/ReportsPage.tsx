@@ -190,28 +190,30 @@ export const ReportsPage: React.FC = () => {
         subtitle="Performance metrics, fuel usage, and distance breakdown"
       />
 
-      {/* Sub Tabs matching Mockup Screen 8 */}
-      <div className="flex items-center gap-6 border-b border-slate-200 pb-2 text-xs font-semibold text-slate-500 overflow-x-auto">
-        {reportTabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveReportTab(tab)}
-            className={`pb-2.5 border-b-2 transition whitespace-nowrap cursor-pointer ${
-              activeReportTab === tab
-                ? 'border-blue-600 text-blue-600 font-bold'
-                : 'border-transparent hover:text-slate-800'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Control Actions Row with Functional Date Range & Export */}
+      {/* Control Actions Row with Report Type Dropdown, Date Range & Export */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
+          {/* 1. Report Type Dropdown */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50/80 border border-blue-200 text-xs text-blue-900 font-semibold shadow-2xs">
+            <FileText className="w-4 h-4 text-blue-600" />
+            <span className="text-blue-700 font-medium">Report Type:</span>
+            <select
+              value={activeReportTab}
+              onChange={(e) => setActiveReportTab(e.target.value)}
+              className="bg-transparent text-blue-950 font-bold focus:outline-none cursor-pointer"
+            >
+              {reportTabs.map((tab) => (
+                <option key={tab} value={tab} className="text-slate-800 font-medium">
+                  {tab}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 2. Date Range Dropdown */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 font-semibold">
             <Calendar className="w-4 h-4 text-slate-400" />
+            <span className="text-slate-500 font-medium">Period:</span>
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
@@ -224,6 +226,7 @@ export const ReportsPage: React.FC = () => {
             </select>
           </div>
 
+          {/* 3. Export Format Dropdown */}
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
             <span>Export Format:</span>
             <select
